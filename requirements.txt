@@ -1,0 +1,2 @@
+Click>=6.6
+feedparser>=5.2.0
