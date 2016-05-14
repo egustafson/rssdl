@@ -14,8 +14,7 @@ setup(
     entry_points = {
         'console_scripts': [
             'rssdb = rssdl.rssdb:cli',
-            'rssdl = rssdl.cli:run',
-            'rssdld = rssdl.cli:daemon',
+            'rssdl = rssdl.cli:cli',
         ],
     },
 )
