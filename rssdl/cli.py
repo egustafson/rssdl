@@ -5,6 +5,7 @@ import click
 import yaml
 
 from rssdl.dom import DOM
+from rssdl.rss import Feed
 
 
 def load_config(conffile):
@@ -52,11 +53,29 @@ def add(ctx, href):
     dbfile = config['sqlite_file']
     dom = DOM(dbfile)
     dom.add_feed(href)
-    
-    if ctx.obj.has_key('CONFIG'):
-        click.echo("config -- \n{}".format(yaml.dump(ctx.obj['CONFIG'])))
-    click.echo("stub - adding feed: {}".format(href))
-    
+
+
+@cli.command()
+@click.argument('href')
+@click.pass_context
+def testfeed(ctx, href):
+    f = Feed(href)
+    result = f.parse()
+    if result > 0:
+        print("Success[{}]".format(result))
+    else:
+        print("Failed.")
+
+
+@cli.command()
+@click.argument('fid')
+@click.pass_context
+def rmfeed(ctx, fid):
+    config = ctx.obj['CONFIG']
+    dbfile = config['sqlite_file']
+    dom = DOM(dbfile)
+    dom.rm_feed(fid)
+
 
 @cli.command()
 @click.pass_context

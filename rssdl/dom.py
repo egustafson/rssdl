@@ -34,13 +34,19 @@ class DOM(object):
 
     def create_db(self):
         Base.metadata.create_all(self._engine)
-    
+
     def add_feed(self, href):
         now = datetime.datetime.now()
         feed = Feed( title="", href=href, active=False,
                      added_at=now, updated_at=now )
         with self.session() as s:
             s.add(feed)
+
+    def rm_feed(self, fid):
+        with self.session() as s:
+            feed = s.query(Feed).filter_by(id=fid).one_or_none()
+            if feed:
+                s.delete(feed)
 
     def list_feeds(self):
         with self.session() as s:
