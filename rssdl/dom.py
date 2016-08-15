@@ -16,8 +16,11 @@ class SessionGuard(Session):
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
-        self.commit()
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type == None:
+            self.commit()
+        else:
+            self.rollback()
 
 
 
@@ -28,30 +31,47 @@ class DOM(object):
         self._engine = create_engine(dburl)
         self._session_factory = sessionmaker( class_=SessionGuard,
                                               bind=self._engine )
+        self._session = None
 
-    def session(self):
-        return self._session_factory()
+    def __enter__(self):
+        self._session = self._session_factory()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type:
+            self._session.rollback()
+        else:
+            self._session.commit()
+
+    def commit():
+        self._session.commit()
+
+    def rollback():
+        self._session.rollback()
+
+    ## ##########
 
     def create_db(self):
         Base.metadata.create_all(self._engine)
+
+    def get_feed(self, fid):
+        return self._session.query(Feed).filter_by(id=fid).one_or_none()
 
     def add_feed(self, href):
         now = datetime.datetime.now()
         feed = Feed( title="", href=href, active=False,
                      added_at=now, updated_at=now )
-        with self.session() as s:
-            s.add(feed)
+        self._session.add(feed)
 
     def rm_feed(self, fid):
-        with self.session() as s:
-            feed = s.query(Feed).filter_by(id=fid).one_or_none()
-            if feed:
-                s.delete(feed)
+        s = self._session
+        feed = s.query(Feed).filter_by(id=fid).one_or_none()
+        if feed:
+            s.delete(feed)
 
     def list_feeds(self):
-        with self.session() as s:
-            fl = s.query(Feed).all()
-            return fl
+        fl = self._session.query(Feed).all()
+        return fl
 
 
 ## Local Variables:
