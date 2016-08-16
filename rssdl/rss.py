@@ -16,6 +16,8 @@ class Feed(object):
         self._d = feedparser.parse(self._href)
         return self._d.status if 'status' in self._d else 0
 
+    def data(self):
+        return self._d
 
 
 ## Local Variables:

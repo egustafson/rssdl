@@ -80,6 +80,17 @@ def dl(ctx):
 
 
 
+@cli.command()
+@click.argument('fid')
+@click.pass_context
+def dump(ctx, fid):
+    with load_dom(ctx) as dom:
+        feed = dom.get_feed(fid)
+        click.echo("{}".format(feed))
+        for item in feed.items:
+            click.echo("{}".format(item))
+
+
 ## Local Variables:
 ## mode: python
 ## End:
