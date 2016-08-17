@@ -8,8 +8,7 @@ from rssdl.dom import DOM
 from feed_processing import update_feed
 
 
-def load_config(conffile):
-    filename = 'rssdl.yml'
+def load_config(filename):
     with open(filename, 'r') as ymlfile:
         cfg = yaml.load(ymlfile)
     return cfg
@@ -25,6 +24,7 @@ def load_dom(ctx):
 
 @click.group()
 @click.option('--conf',
+              default='rssdl.yml',
               type=click.Path(exists=True, dir_okay=False))
 @click.pass_context
 def cli(ctx, conf):
