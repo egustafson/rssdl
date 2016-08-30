@@ -18,7 +18,8 @@ class Feed(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     href = Column(String)
-    active = Column(Boolean)
+    subdir = Column(String)
+    active = Column(Boolean, default=True)
     added_at = Column(DateTime)
     updated_at = Column(DateTime)
     items = relationship("Item", back_populates="feed")
@@ -52,6 +53,8 @@ class Attachment(Base):
     id = Column(Integer, primary_key=True)
     media_type = Column(String)
     link = Column(String)
+    path = Column(String)
+    expired = Column(Boolean, default=False)
     item_id = Column(Integer, ForeignKey('items.id'))
     item = relationship("Item", back_populates="attachments")
 

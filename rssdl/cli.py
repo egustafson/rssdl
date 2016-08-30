@@ -6,6 +6,7 @@ import yaml
 
 from rssdl.dom import DOM
 from feed_processing import update_feed
+from feed_processing import dl_feed
 
 
 def load_config(filename):
@@ -18,6 +19,10 @@ def load_dom(ctx):
     config = ctx.obj['CONFIG']
     dbfile = config['sqlite_file']
     return DOM(dbfile)
+
+def cfg_dl_dir(ctx):
+    config = ctx.obj['CONFIG']
+    return config.get('dl_dir', '/tmp')
 
 
 ## ############################################################
@@ -74,9 +79,13 @@ def update(ctx, fid):
 
 
 @cli.command()
+@click.argument('fid')
 @click.pass_context
-def dl(ctx):
-    click.echo('stub - done.')
+def dl(ctx, fid):
+    dl_dir = cfg_dl_dir(ctx)
+    dom = load_dom(ctx)
+    msg = dl_feed(dom, fid, dl_dir)
+    click.echo(msg)
 
 
 
@@ -88,7 +97,9 @@ def dump(ctx, fid):
         feed = dom.get_feed(fid)
         click.echo("{}".format(feed))
         for item in feed.items:
-            click.echo("{}".format(item))
+            click.echo(" {}".format(item))
+            for att in item.attachments:
+                click.echo("  {}".format(att))
 
 
 ## Local Variables:

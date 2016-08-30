@@ -4,8 +4,8 @@
 import datetime
 
 from rssdl.rss import Feed
-
 from rssdl.sql import Item
+from rssdl.sql import Attachment
 
 
 def update_feed(dom, fid):
@@ -40,13 +40,44 @@ def update_feed(dom, fid):
                              pub_at = pub_time,
                              updated_at = datetime.datetime.now() )
                 feed.items.append( item )
-                #
-#                 for encl in entry.enclosures:
-#                     att = Attachment( link = encl.href,
-#                                       media_type = encl['type'] )
-#                     item.append( att )
+                for encl in entry.enclosures:
+                    att = Attachment( link = encl.href,
+                                      media_type = encl['type'] )
+                    item.attachments.append( att )
     return "success."
 
+## ######################################################################
+
+import os.path
+
+from urlparse import urlparse
+
+import requests
+
+
+def dl_file(url, fn):
+    r = requests.get(url, stream=True)
+    with open(fn, 'wb') as fd:
+        for chunk in r.iter_content(4096):
+            fd.write(chunk)
+
+
+def dl_feed(dom, fid, dl_dir):
+    assert( os.path.isdir(dl_dir) )
+    with dom as d:
+        feed = d.get_feed(fid)
+        for item in feed.items:
+            for att in item.attachments:
+                if att.path == None:
+                    link = att.link
+                    url = urlparse(link)
+                    base = os.path.basename(url.path)
+                    fn = os.path.join(dl_dir, base)
+                    print("dl: {} -> {}".format(link, fn))
+                    dl_file(link, fn)
+                    att.path = fn
+
+    return "stub-result."
 
 
 ## Local Variables:
