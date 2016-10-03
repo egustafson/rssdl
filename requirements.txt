@@ -1,3 +1,5 @@
 Click>=6.6
+PyYAML>=3.11
 feedparser>=5.2.0
 requests>=2.11.1
+SQLAlchemy>=1.0.11

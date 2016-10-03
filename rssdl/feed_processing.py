@@ -8,11 +8,11 @@ from rssdl.sql import Item
 from rssdl.sql import Attachment
 
 
-def update_feed(dom, fid):
+def update_feed(dom, feed_id):
     with dom as d:
-        feed = d.get_feed(fid)
+        feed = d.get_feed(feed_id)
     if not feed:
-        return "No such feed_id[{}]".format(fid)
+        return "No such feed_id[{}]".format(feed_id)
     f = Feed(feed.href)
     result = f.parse()
     if result == 0:
@@ -21,7 +21,7 @@ def update_feed(dom, fid):
     #
     d = f.data()
     with dom as dom:
-        feed = dom.get_feed(fid)
+        feed = dom.get_feed(feed_id)
         feed.title = d.feed.title
         feed.active = True
         feed.updated_at = datetime.datetime.now()
@@ -62,10 +62,27 @@ def dl_file(url, fn):
             fd.write(chunk)
 
 
-def dl_feed(dom, fid, dl_dir):
+def dl_item(dom, feed_id, item_id, dl_dir):
     assert( os.path.isdir(dl_dir) )
     with dom as d:
-        feed = d.get_feed(fid)
+        item = d.get_item(feed_id, item_id)
+        assert(item!=None)
+        for att in item.attachments:
+            if att.path == None:
+                link = att.link
+                url = urlparse(link)
+                base = os.path.basename(url.path)
+                fn = os.path.join(dl_dir, base)
+                print("dl: {} -> {}".format(link, fn))
+                dl_file(link, fn)
+                att.path = fn
+    return "stub-result."
+
+
+def dl_feed(dom, feed_id, dl_dir):
+    assert( os.path.isdir(dl_dir) )
+    with dom as d:
+        feed = d.get_feed(feed_id)
         for item in feed.items:
             for att in item.attachments:
                 if att.path == None:

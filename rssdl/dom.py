@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from rssdl.sql import Base, Feed
+from rssdl.sql import Base, Feed, Item
 
 
 
@@ -70,8 +70,28 @@ class DOM(object):
             s.delete(feed)
 
     def list_feeds(self):
-        fl = self._session.query(Feed).all()
-        return fl
+        result = []
+        for feed in self._session.query(Feed).all():
+            result.append("{:3}: {}".format(feed.id, feed.href))
+        return result
+
+    def list_feed(self, feed_id):
+        result = []
+        for item in self._session.query(Item)\
+                                 .filter(feed_id==feed_id)\
+                                 .all():
+            result.append("{:3} [{}] {}"\
+                          .format(item.id, item.pub_at, item.title))
+        return result
+
+    def list_item(self, feed_id, item_id):
+        result = []
+        return "stub"
+
+    def get_item(self, feed_id, item_id):
+        return self._session.query(Item)\
+                            .filter_by(id=item_id)\
+                            .one_or_none()
 
 
 ## Local Variables:

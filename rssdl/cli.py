@@ -7,6 +7,7 @@ import yaml
 from rssdl.dom import DOM
 from feed_processing import update_feed
 from feed_processing import dl_feed
+from feed_processing import dl_item
 
 
 def load_config(filename):
@@ -44,13 +45,29 @@ def init(ctx):
     dom.create_db()
 
 
-@cli.command()
+@cli.command(name='list')
+@click.argument('ids', nargs=-1)
 @click.pass_context
-def list(ctx):
+def feed_list(ctx, ids):
+    args = list(ids)
+    feed_id = None
+    item_id = None
+    if len(args):
+        feed_id = args.pop()
+    if len(args):
+        item_id = args.pop()
+    if len(args):
+        click.UsageError("too many options provided")
     with load_dom(ctx) as dom:
-        fl = dom.list_feeds()
-    for feed in fl:
-        click.echo("{:3}: {}".format(feed.id, feed.href))
+        if item_id:
+            response = dom.list_item(feed_id, item_id)
+        elif feed_id:
+            response = dom.list_feed(feed_id)
+        else:
+            response = dom.list_feeds()
+        for line in response:
+            click.echo(line)
+            #click.echo("{:3}: {}".format(feed.id, feed.href))
 
 
 @cli.command()
@@ -87,6 +104,16 @@ def dl(ctx, fid):
     msg = dl_feed(dom, fid, dl_dir)
     click.echo(msg)
 
+
+@cli.command()
+@click.argument('feed_id')
+@click.argument('item_id')
+@click.pass_context
+def dl1(ctx, feed_id, item_id):
+    dl_dir = cfg_dl_dir(ctx)
+    dom = load_dom(ctx)
+    msg = dl_item(dom, feed_id, item_id, dl_dir)
+    click.echo(msg)
 
 
 @cli.command()
