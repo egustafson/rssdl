@@ -1,0 +1,11 @@
+---
+# rssdl configuration file
+#
+sqlite_file: ./rssdl.sqlite
+tmp_dir: /tmp
+dl_dir: ./downloads
+
+...
+# Local Variables:
+# mode: yaml
+# End:

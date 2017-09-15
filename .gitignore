@@ -1,7 +1,9 @@
-rssdl.yml
+rssdl.yaml
 rssdl.sqlite
-rss-dl/
+downloads/
 
+## virtualenv environment
+venv
 
 ## ----- General Python ignores -----
 ##

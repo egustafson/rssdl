@@ -30,7 +30,7 @@ def cfg_dl_dir(ctx):
 
 @click.group()
 @click.option('--conf',
-              default='rssdl.yml',
+              default='rssdl.yaml',
               type=click.Path(exists=True, dir_okay=False))
 @click.pass_context
 def cli(ctx, conf):

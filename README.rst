@@ -16,7 +16,37 @@ Usage
 Dev - Installation
 ------------------
 
-Install locally using:
+    > virtualenv venv
+    > source venv/bin/activate.csh     ## for (t)csh
+    > rehash                           ## for (t)csh
+    > pip install -r requirements.txt
+    > python setup.py develop
+    > rehash                           ## for (t)csh
+    > rssdl --help
+
+DB (re)initialization
+
+    > cp rssdl.yaml-example rssdl.yaml
+    #
+    # edit rssdl.yam as appropriate -- defaults should be ok.
+    #
+    > rssdl init
+    #
+    # DB initialized
+    #
+    > rssdl add '<feed-url>'
+    > rssdl list
+      1: <feed-url>
+    > rssdl update 1
+    Success.
+    > rssdl list 1
+      1 [<timestamp>] 1st Article Title
+      ...
+      n [<timestamp>] nth Article Title
+    >
+
+Local user directory installation (install `requirements.txt`
+somewhere):
 
     > python setup.py develop --user
 
